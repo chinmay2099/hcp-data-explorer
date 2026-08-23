@@ -8,7 +8,14 @@ function App() {
   if (loading) {
     return (
       <div className="loading-container">
-        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
           <CircularProgress />
           <Typography>Loading data...</Typography>
         </Box>
@@ -17,8 +24,8 @@ function App() {
   }
 
   return (
-    <Container className="app-container" maxWidth="xl">
-      <Box className="app-header">
+    <Container className="app-container" maxWidth={false} sx={{ px: 3 }}>
+      <Box className="app-header" sx={{ mb: 3 }}>
         <Typography className="app-title" variant="h4">
           HCP Data Explorer
         </Typography>
