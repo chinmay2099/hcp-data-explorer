@@ -1,14 +1,33 @@
-import { Container, Typography, Box, CircularProgress } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Box,
+  CircularProgress,
+  Button,
+} from "@mui/material";
 import { HcpTable } from "./components/HcpTable";
 import { useHcpData } from "./hooks/useHcpData";
 import { useFiltering } from "./hooks/useFiltering";
 import { useSorting } from "./hooks/useSorting";
+import { useEditHistory } from "./hooks/useEditHistory";
 import { SearchBar } from "./components/SearchBar";
 import { RegionFilter } from "./components/RegionFilter";
 import { TerritoryFilter } from "./components/TerritoryFilter";
+import { useState, useEffect } from "react";
+import { type HcpRow } from "./types/hcp";
+import UndoIcon from "@mui/icons-material/Undo";
+import RedoIcon from "@mui/icons-material/Redo";
 
 function App() {
-  const { data, loading } = useHcpData();
+  const { data: initialData, loading } = useHcpData();
+  const [data, setData] = useState<HcpRow[]>([]);
+
+  useEffect(() => {
+    if (initialData.length > 0) {
+      setData(initialData);
+    }
+  }, [initialData]);
+
   const {
     searchTerm,
     setSearchTerm,
@@ -22,6 +41,27 @@ function App() {
   } = useFiltering(data);
 
   const { sortState, sortedData, toggleSort } = useSorting(filteredData);
+
+  const { addCommand, undo, redo, canUndo, canRedo } = useEditHistory();
+
+  const handleDataUpdate = (
+    updatedData: HcpRow[],
+    rowKey: string,
+    field: keyof HcpRow,
+    oldValue: number | string,
+    newValue: number,
+  ) => {
+    setData(updatedData);
+    addCommand({ rowKey, field, oldValue, newValue });
+  };
+
+  const handleUndo = () => {
+    setData((prev) => undo(prev));
+  };
+
+  const handleRedo = () => {
+    setData((prev) => redo(prev));
+  };
 
   if (loading) {
     return (
@@ -63,12 +103,31 @@ function App() {
           onTerritoryChange={setSelectedTerritory}
           disabled={selectedRegion === "all"}
         />
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={handleUndo}
+          disabled={!canUndo}
+          startIcon={<UndoIcon />}
+        >
+          Undo
+        </Button>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={handleRedo}
+          disabled={!canRedo}
+          startIcon={<RedoIcon />}
+        >
+          Redo
+        </Button>
       </Box>
       <HcpTable
         data={sortedData}
         autoExpand={true}
         sortState={sortState}
         onSortToggle={toggleSort}
+        onDataUpdate={handleDataUpdate}
       />
     </Container>
   );
