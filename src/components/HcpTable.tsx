@@ -16,6 +16,21 @@ import { useGrouping } from "../hooks/useGrouping";
 import { GroupRow } from "./GroupRow";
 import { HcpRowComponent } from "./HcpRow";
 import { type SortState, type SortColumn } from "../hooks/sorting.utils";
+import { validateCalls } from "../lib/mock-validator";
+
+interface HcpTableProps {
+  data: HcpRow[];
+  autoExpand?: boolean;
+  sortState: SortState;
+  onSortToggle: (column: SortColumn) => void;
+  onDataUpdate: (
+    updatedData: HcpRow[],
+    rowKey: string,
+    field: keyof HcpRow,
+    oldValue: number | string,
+    newValue: number,
+  ) => void;
+}
 
 interface HcpTableProps {
   data: HcpRow[];
@@ -29,9 +44,11 @@ export function HcpTable({
   autoExpand = false,
   sortState,
   onSortToggle,
+  onDataUpdate,
 }: HcpTableProps) {
   const [domRowCount, setDomRowCount] = useState(0);
   const [lastOperationTime, setLastOperationTime] = useState<number>(0);
+  const [pendingEdits, setPendingEdits] = useState<Set<string>>(new Set());
   const theme = useTheme();
 
   const parentRef = useRef<HTMLDivElement>(null);
@@ -40,6 +57,38 @@ export function HcpTable({
     data,
     autoExpand,
   );
+
+  const handleEdit = async (
+    rowKey: string,
+    field: keyof HcpRow,
+    value: number,
+  ) => {
+    setPendingEdits((prev) => new Set(prev).add(rowKey));
+
+    try {
+      if (field === "calls") {
+        await validateCalls(value);
+      }
+
+      const row = data.find((r) => r.rowKey === rowKey);
+      if (!row) return;
+
+      const oldValue = row[field];
+      if (oldValue === null) return;
+
+      const updatedData = data.map((r) =>
+        r.rowKey === rowKey ? { ...r, [field]: value } : r,
+      );
+
+      onDataUpdate(updatedData, rowKey, field, oldValue, value);
+    } finally {
+      setPendingEdits((prev) => {
+        const next = new Set(prev);
+        next.delete(rowKey);
+        return next;
+      });
+    }
+  };
 
   const virtualizer = useVirtualizer({
     count: renderItems.length,
@@ -293,7 +342,13 @@ export function HcpTable({
                     />
                   )}
 
-                  {item.type === "row" && <HcpRowComponent row={item.row} />}
+                  {item.type === "row" && (
+                    <HcpRowComponent
+                      row={item.row}
+                      onEdit={handleEdit}
+                      pendingEdits={pendingEdits}
+                    />
+                  )}
                 </div>
               );
             })}
