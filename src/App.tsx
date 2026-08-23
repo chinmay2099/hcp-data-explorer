@@ -1,9 +1,24 @@
 import { Container, Typography, Box, CircularProgress } from "@mui/material";
 import { HcpTable } from "./components/HcpTable";
 import { useHcpData } from "./hooks/useHcpData";
+import { useFiltering } from "./hooks/useFiltering";
+import { SearchBar } from "./components/SearchBar";
+import { RegionFilter } from "./components/RegionFilter";
+import { TerritoryFilter } from "./components/TerritoryFilter";
 
 function App() {
   const { data, loading } = useHcpData();
+  const {
+    searchTerm,
+    setSearchTerm,
+    selectedRegion,
+    setSelectedRegion,
+    selectedTerritory,
+    setSelectedTerritory,
+    availableRegions,
+    availableTerritories,
+    filteredData,
+  } = useFiltering(data);
 
   if (loading) {
     return (
@@ -24,16 +39,36 @@ function App() {
   }
 
   return (
-    <Container className="app-container" maxWidth={false} sx={{ px: 3 }}>
-      <Box className="app-header" sx={{ mb: 3 }}>
-        <Typography className="app-title" variant="h4">
-          HCP Data Explorer
-        </Typography>
-        <Typography className="records-count" variant="body1">
-          Total Records: {data.length.toLocaleString()}
+    <Container maxWidth={false} sx={{ px: 3 }}>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4">HCP Data Explorer</Typography>
+        <Typography variant="body1">
+          Total Records: {data.length.toLocaleString()} | Showing:{" "}
+          {filteredData.length.toLocaleString()}
         </Typography>
       </Box>
-      <HcpTable data={data} />
+      <Box sx={{ mb: 3, display: "flex", gap: 2, alignItems: "center" }}>
+        <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+        <RegionFilter
+          selectedRegion={selectedRegion}
+          availableRegions={availableRegions}
+          onRegionChange={setSelectedRegion}
+        />
+        <TerritoryFilter
+          selectedTerritory={selectedTerritory}
+          availableTerritories={availableTerritories}
+          onTerritoryChange={setSelectedTerritory}
+          disabled={selectedRegion === "all"}
+        />
+      </Box>
+      <HcpTable
+        data={filteredData}
+        autoExpand={
+          searchTerm.length > 0 ||
+          selectedRegion !== "all" ||
+          selectedTerritory !== "all"
+        }
+      />
     </Container>
   );
 }
