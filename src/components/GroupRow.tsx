@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { type RenderItem } from "../types/hcp";
 
 interface GroupRowProps {
@@ -8,6 +8,7 @@ interface GroupRowProps {
 }
 
 export function GroupRow({ item, onToggle, level }: GroupRowProps) {
+  const theme = useTheme();
   const isRegion = item.type === "region";
   const displayName = isRegion ? item.region : item.territory;
   const paddingLeft = level * 2;
@@ -21,8 +22,8 @@ export function GroupRow({ item, onToggle, level }: GroupRowProps) {
     <Box
       onClick={onToggle}
       sx={{
-        bgcolor: isRegion ? "primary.main" : "grey.100",
-        color: isRegion ? "primary.contrastText" : "text.primary",
+        bgcolor: isRegion ? theme.palette.primary.main : "grey.100",
+        color: isRegion ? theme.palette.primary.contrastText : "text.primary",
         height: "53px",
         px: 2,
         cursor: "pointer",
@@ -30,7 +31,7 @@ export function GroupRow({ item, onToggle, level }: GroupRowProps) {
         alignItems: "center",
         gap: 1,
         "&:hover": {
-          bgcolor: isRegion ? "primary.dark" : "grey.200",
+          bgcolor: isRegion ? theme.palette.primary.dark : "grey.200",
           opacity: 0.9,
         },
       }}

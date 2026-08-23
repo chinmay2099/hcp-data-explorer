@@ -7,6 +7,7 @@ import {
   Box,
   Typography,
   Tooltip,
+  useTheme,
 } from "@mui/material";
 import { type HcpRow } from "../types/hcp";
 import { useVirtualizer } from "@tanstack/react-virtual";
@@ -31,6 +32,7 @@ export function HcpTable({
 }: HcpTableProps) {
   const [domRowCount, setDomRowCount] = useState(0);
   const [lastOperationTime, setLastOperationTime] = useState<number>(0);
+  const theme = useTheme();
 
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -139,6 +141,7 @@ export function HcpTable({
           overflow: "hidden",
           boxShadow: 3,
           borderRadius: 2,
+          bgcolor: theme.palette.background.paper,
         }}
       >
         <TableContainer
@@ -149,11 +152,11 @@ export function HcpTable({
         >
           <TableHead
             sx={{
-              bgcolor: "primary.main",
+              bgcolor: theme.palette.primary.main,
               width: "100%",
               display: "table",
               "& .MuiTableCell-head": {
-                color: "primary.contrastText",
+                color: theme.palette.primary.contrastText,
                 fontWeight: 600,
                 fontSize: "0.875rem",
                 textTransform: "uppercase",
