@@ -2,6 +2,7 @@ import { Container, Typography, Box, CircularProgress } from "@mui/material";
 import { HcpTable } from "./components/HcpTable";
 import { useHcpData } from "./hooks/useHcpData";
 import { useFiltering } from "./hooks/useFiltering";
+import { useSorting } from "./hooks/useSorting";
 import { SearchBar } from "./components/SearchBar";
 import { RegionFilter } from "./components/RegionFilter";
 import { TerritoryFilter } from "./components/TerritoryFilter";
@@ -19,6 +20,8 @@ function App() {
     availableTerritories,
     filteredData,
   } = useFiltering(data);
+
+  const { sortState, sortedData, toggleSort } = useSorting(filteredData);
 
   if (loading) {
     return (
@@ -44,7 +47,7 @@ function App() {
         <Typography variant="h4">HCP Data Explorer</Typography>
         <Typography variant="body1">
           Total Records: {data.length.toLocaleString()} | Showing:{" "}
-          {filteredData.length.toLocaleString()}
+          {sortedData.length.toLocaleString()}
         </Typography>
       </Box>
       <Box sx={{ mb: 3, display: "flex", gap: 2, alignItems: "center" }}>
@@ -62,12 +65,10 @@ function App() {
         />
       </Box>
       <HcpTable
-        data={filteredData}
-        autoExpand={
-          searchTerm.length > 0 ||
-          selectedRegion !== "all" ||
-          selectedTerritory !== "all"
-        }
+        data={sortedData}
+        autoExpand={true}
+        sortState={sortState}
+        onSortToggle={toggleSort}
       />
     </Container>
   );

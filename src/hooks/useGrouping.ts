@@ -16,7 +16,7 @@ export function useGrouping(data: HcpRow[], autoExpand: boolean = false) {
   const groupedData = useMemo(() => groupByRegionAndTerritory(data), [data]);
 
   useEffect(() => {
-    if (autoExpand && data.length > 0 && data.length < 1000) {
+    if (autoExpand && data.length > 0) {
       const allRegions = new Set(groupedData.keys());
       const allTerritories = new Set<string>();
 
