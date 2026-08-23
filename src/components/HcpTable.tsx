@@ -7,12 +7,15 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { type HcpRecord } from "../lib/data-generator";
+import { type HcpRow } from "../types/hcp";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef, useState, useEffect } from "react";
+import { useGrouping } from "../hooks/useGrouping";
+import { GroupRow } from "./GroupRow";
+import { HcpRowComponent } from "./HcpRow";
 
 interface HcpTableProps {
-  data: HcpRecord[];
+  data: HcpRow[];
 }
 
 export function HcpTable({ data }: HcpTableProps) {
@@ -21,8 +24,10 @@ export function HcpTable({ data }: HcpTableProps) {
 
   const parentRef = useRef<HTMLDivElement>(null);
 
+  const { renderItems, toggleRegion, toggleTerritory } = useGrouping(data);
+
   const virtualizer = useVirtualizer({
-    count: data.length,
+    count: renderItems.length,
     getScrollElement: () => parentRef.current,
     estimateSize: () => 53,
     overscan: 5,
@@ -92,6 +97,9 @@ export function HcpTable({ data }: HcpTableProps) {
               <TableCell sx={{ width: "90px", textAlign: "right" }}>
                 NRx
               </TableCell>
+              <TableCell sx={{ width: "90px", textAlign: "right" }}>
+                CPI
+              </TableCell>
             </TableRow>
           </TableHead>
         </TableContainer>
@@ -110,10 +118,10 @@ export function HcpTable({ data }: HcpTableProps) {
             }}
           >
             {virtualItems.map((virtualRow) => {
-              const row = data[virtualRow.index];
+              const item = renderItems[virtualRow.index];
               return (
                 <div
-                  key={virtualRow.index}
+                  key={item.key}
                   style={{
                     position: "absolute",
                     top: 0,
@@ -121,106 +129,25 @@ export function HcpTable({ data }: HcpTableProps) {
                     width: "100%",
                     height: "53px",
                     transform: `translateY(${virtualRow.start}px)`,
-                    display: "flex",
-                    alignItems: "center",
-                    borderBottom: "1px solid",
-                    borderColor: "rgba(224, 224, 224, 1)",
-                    padding: "0 16px",
-                    transition: "background-color 0.2s ease",
-                    cursor: "default",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      "rgba(0, 0, 0, 0.04)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "transparent";
                   }}
                 >
-                  <div
-                    style={{
-                      width: "140px",
-                      flexShrink: 0,
-                      fontFamily: "monospace",
-                      fontSize: "0.875rem",
-                      color: "text.secondary",
-                      textAlign: "left",
-                    }}
-                  >
-                    {row.id}
-                  </div>
-                  <div
-                    style={{
-                      flex: 1,
-                      minWidth: 0,
-                      fontWeight: 500,
-                      color: "text.primary",
-                      textAlign: "left",
-                    }}
-                  >
-                    {row.name}
-                  </div>
-                  <div
-                    style={{
-                      width: "160px",
-                      flexShrink: 0,
-                      color: "text.secondary",
-                      textAlign: "left",
-                    }}
-                  >
-                    {row.specialty || "-"}
-                  </div>
-                  <div
-                    style={{
-                      width: "130px",
-                      flexShrink: 0,
-                      color: "text.primary",
-                      textAlign: "left",
-                    }}
-                  >
-                    {row.region}
-                  </div>
-                  <div
-                    style={{
-                      width: "160px",
-                      flexShrink: 0,
-                      color: "text.primary",
-                      textAlign: "left",
-                    }}
-                  >
-                    {row.territory}
-                  </div>
-                  <div
-                    style={{
-                      width: "90px",
-                      flexShrink: 0,
-                      fontWeight: 600,
-                      color: "primary.main",
-                      textAlign: "right",
-                    }}
-                  >
-                    {row.calls}
-                  </div>
-                  <div
-                    style={{
-                      width: "90px",
-                      flexShrink: 0,
-                      color: "text.primary",
-                      textAlign: "right",
-                    }}
-                  >
-                    {row.trx}
-                  </div>
-                  <div
-                    style={{
-                      width: "90px",
-                      flexShrink: 0,
-                      color: "text.primary",
-                      textAlign: "right",
-                    }}
-                  >
-                    {row.nrx}
-                  </div>
+                  {item.type === "region" && (
+                    <GroupRow
+                      item={item}
+                      onToggle={() => toggleRegion(item.region)}
+                      level={0}
+                    />
+                  )}
+                  {item.type === "territory" && (
+                    <GroupRow
+                      item={item}
+                      onToggle={() =>
+                        toggleTerritory(item.region, item.territory)
+                      }
+                      level={1}
+                    />
+                  )}
+                  {item.type === "row" && <HcpRowComponent row={item.row} />}
                 </div>
               );
             })}
