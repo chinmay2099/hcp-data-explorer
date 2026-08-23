@@ -519,9 +519,14 @@ npm run dev
 
 Open http://localhost:5173
 
-## this app is desigbed featrue wise sp below finf pr and attaced screenshots
+## Pull Requests and Screenshots
 
-PR 1
+This app was built feature-wise through the following pull requests:
+
+---
+
+### PR #1
+
 **PR Title - Initialize HCP Data Explorer with Material UI and Data Display**
 
 **FE PR** - https://github.com/chinmay2099/hcp-data-explorer/pull/1
@@ -538,7 +543,9 @@ PR 1
 1. HCP table with generated records
    <img width="1917" height="988" alt="image" src="https://github.com/user-attachments/assets/91df0307-f746-4ec7-8938-067cbcf8568f" />
 
-pr2
+---
+
+### PR #2
 
 **PR Title - Add Virtualized Rendering for 50,000 HCP Records**
 
@@ -557,7 +564,9 @@ pr2
 1. Virtualized table with professional styling and performance metrics
    <img width="1910" height="868" alt="image" src="https://github.com/user-attachments/assets/48af6548-8302-4757-b4bf-eb5923201574" />
 
-pr 3
+---
+
+### PR #3
 
 **PR Title - Add Region and Territory Grouping with Aggregates and CPI**
 
@@ -584,7 +593,10 @@ pr 3
 3. Expanded Territory view showing individual HCP records with CPI
    <img width="1919" height="932" alt="image" src="https://github.com/user-attachments/assets/68a61114-3314-4baa-bf3c-f75a0b730a17" />
 
-pr 4
+---
+
+### PR #4
+
 **PR Title - Add Search and Region/Territory Filters to HCP Data Explorer**
 
 **FE PR** - https://github.com/chinmay2099/hcp-data-explorer/pull/4
@@ -608,7 +620,9 @@ pr 4
 3. Territory filter applied
    <img width="1912" height="861" alt="image" src="https://github.com/user-attachments/assets/053d6a08-7697-43d3-97d9-9326b0c488f5" />
 
-pr 5
+---
+
+### PR #5
 
 **PR Title - Add Sorting for HCP Data Explorer**
 
@@ -629,7 +643,10 @@ pr 5
 3. Calls/TRx sorting applied
    <img width="1917" height="798" alt="image" src="https://github.com/user-attachments/assets/cf80fd46-63f4-422c-aaa2-f9e975da0843" />
 
-pr 6
+---
+
+### PR #6
+
 **PR Title - Add Async-Validated Inline Editing with Undo/Redo**
 
 **FE PR** - https://github.com/chinmay2099/hcp-data-explorer/pull/6
@@ -653,6 +670,10 @@ pr 6
 
 3. Undo/Redo after successful edit
    <img width="1892" height="833" alt="image" src="https://github.com/user-attachments/assets/c964dcc1-240e-4023-8de6-6eff6f2569d4" />
+
+---
+
+### PR #7
 
 **PR Title - Add Runtime Tenant Theming**
 
@@ -678,3 +699,18 @@ pr 6
 
 3. Meridian tenant (red theme)
    <img width="1899" height="809" alt="image" src="https://github.com/user-attachments/assets/6481e943-277b-4f41-b752-740fd652866f" />
+
+---
+
+### PR #8
+
+**PR Title - Add Documentation (README and ASSUMPTIONS)**
+
+**FE PR** - https://github.com/chinmay2099/hcp-data-explorer/pull/9
+
+**PR Description -**
+
+- Added comprehensive README.md with architecture overview
+- Added FR-5 design document for bulk edit with partial failure
+- Added FR-6 design document for undo at scale
+- Added ASSUMPTIONS.md documenting all data quality issues
