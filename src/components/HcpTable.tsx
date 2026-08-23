@@ -16,15 +16,19 @@ import { HcpRowComponent } from "./HcpRow";
 
 interface HcpTableProps {
   data: HcpRow[];
+  autoExpand?: boolean;
 }
 
-export function HcpTable({ data }: HcpTableProps) {
+export function HcpTable({ data, autoExpand = false }: HcpTableProps) {
   const [domRowCount, setDomRowCount] = useState(0);
   const [lastOperationTime, setLastOperationTime] = useState<number>(0);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const { renderItems, toggleRegion, toggleTerritory } = useGrouping(data);
+  const { renderItems, toggleRegion, toggleTerritory } = useGrouping(
+    data,
+    autoExpand,
+  );
 
   const virtualizer = useVirtualizer({
     count: renderItems.length,
