@@ -1,3 +1,6 @@
+// Component: Territory filter dropdown
+// Allows filtering data by territory within selected region
+// Disabled when "All Regions" is selected (cascading filter)
 import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
 
 interface TerritoryFilterProps {

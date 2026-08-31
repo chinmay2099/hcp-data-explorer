@@ -1,3 +1,6 @@
+// Component: Main table component with virtual scrolling for performance
+// Handles grouping, sorting, editing, and virtualization of 50k+ rows
+// Uses @tanstack/react-virtual for efficient DOM rendering
 import {
   TableContainer,
   TableHead,
@@ -15,8 +18,8 @@ import { useRef, useState, useEffect } from "react";
 import { useGrouping } from "../hooks/useGrouping";
 import { GroupRow } from "./GroupRow";
 import { HcpRowComponent } from "./HcpRow";
-import { type SortState, type SortColumn } from "../hooks/sorting.utils";
-import { validateCalls } from "../lib/mock-validator";
+import { type SortState, type SortColumn } from "../utils/sorting.utils";
+import { validateCalls } from "../utils/mock-validator";
 
 interface HcpTableProps {
   data: HcpRow[];
@@ -32,13 +35,6 @@ interface HcpTableProps {
   ) => void;
 }
 
-interface HcpTableProps {
-  data: HcpRow[];
-  autoExpand?: boolean;
-  sortState: SortState;
-  onSortToggle: (column: SortColumn) => void;
-}
-
 export function HcpTable({
   data,
   autoExpand = false,
@@ -46,18 +42,22 @@ export function HcpTable({
   onSortToggle,
   onDataUpdate,
 }: HcpTableProps) {
+  // Performance metrics: DOM row count and operation time
   const [domRowCount, setDomRowCount] = useState(0);
   const [lastOperationTime, setLastOperationTime] = useState<number>(0);
+  // Track rows with pending edits to prevent concurrent edits
   const [pendingEdits, setPendingEdits] = useState<Set<string>>(new Set());
   const theme = useTheme();
 
   const parentRef = useRef<HTMLDivElement>(null);
 
+  // Group data for hierarchical display
   const { renderItems, toggleRegion, toggleTerritory } = useGrouping(
     data,
     autoExpand,
   );
 
+  // Handle cell edit with validation
   const handleEdit = async (
     rowKey: string,
     field: keyof HcpRow,
@@ -90,13 +90,18 @@ export function HcpTable({
     }
   };
 
+  // Virtual scrolling configuration
+  // Only renders visible rows + overscan buffer for performance
   const virtualizer = useVirtualizer({
     count: renderItems.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 53,
-    overscan: 5,
+    estimateSize: () => 53, // Fixed row height
+    overscan: 5, // Render 5 extra rows above/below viewport
   });
 
+  const virtualItems = virtualizer.getVirtualItems();
+
+  // Track performance metrics
   useEffect(() => {
     const startTime = performance.now();
 
@@ -105,10 +110,9 @@ export function HcpTable({
 
     const endTime = performance.now();
     setLastOperationTime(endTime - startTime);
-  }, [virtualizer]);
+  }, [virtualItems.length]);
 
-  const virtualItems = virtualizer.getVirtualItems();
-
+  // Get sort indicator icon based on sort state
   const getSortIndicator = (column: SortColumn) => {
     if (sortState.column !== column) {
       return (
@@ -143,6 +147,7 @@ export function HcpTable({
     onSortToggle(column);
   };
 
+  // Styles for sortable headers
   const sortableHeaderSx = {
     textAlign: "left",
     cursor: "pointer",

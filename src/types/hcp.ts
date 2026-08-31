@@ -1,4 +1,4 @@
-import { type HcpRecord } from "../lib/data-generator";
+import { type HcpRecord } from "../utils/data-generator";
 
 export interface HcpRow extends HcpRecord {
   rowKey: string;

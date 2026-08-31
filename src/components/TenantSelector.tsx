@@ -1,3 +1,6 @@
+// Component: Tenant selector dropdown
+// Allows switching between different tenant themes
+// Capitalizes tenant names for display
 import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 
 interface TenantSelectorProps {

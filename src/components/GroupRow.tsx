@@ -1,3 +1,6 @@
+// Component: Renders region or territory group header rows
+// Displays expand/collapse toggle and aggregate statistics
+// Different styling for regions (primary color) vs territories (grey)
 import { Box, Typography, useTheme } from "@mui/material";
 import { type RenderItem } from "../types/hcp";
 
@@ -11,7 +14,7 @@ export function GroupRow({ item, onToggle, level }: GroupRowProps) {
   const theme = useTheme();
   const isRegion = item.type === "region";
   const displayName = isRegion ? item.region : item.territory;
-  const paddingLeft = level * 2;
+  const paddingLeft = level * 2; // Indent based on hierarchy level
 
   const formatCPI = (cpi: number | null): string => {
     if (cpi === null) return "—";

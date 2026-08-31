@@ -1,3 +1,5 @@
+// Component: Search input field
+// Filters data by matching text in name or ID fields (case-insensitive)
 import { TextField, Box } from "@mui/material";
 
 interface SearchBarProps {

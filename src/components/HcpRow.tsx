@@ -1,6 +1,9 @@
+// Component: Renders individual HCP data row with inline editing
+// Supports editing the "calls" field via popover modal
+// Shows hover effects and edit icon for editable cells
 import { type HcpRow } from "../types/hcp";
-import { calculateCPI, normalizeCalls } from "../lib/hcp-utils";
-import { useState, useRef } from "react";
+import { calculateCPI, normalizeCalls } from "../utils/hcp-utils";
+import { useState } from "react";
 import {
   TextField,
   IconButton,
@@ -22,24 +25,27 @@ interface HcpRowProps {
 type EditableField = "calls";
 
 export function HcpRowComponent({ row, onEdit, pendingEdits }: HcpRowProps) {
+  // Edit state: which field is being edited, current value, loading, error, popover anchor
   const [editingField, setEditingField] = useState<EditableField | null>(null);
   const [editValue, setEditValue] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
+  // Calculate derived values for display
   const normalizedCalls = normalizeCalls(row.calls);
   const cpi = calculateCPI(normalizedCalls || 0, row.trx);
   const displayCPI = cpi === null ? "—" : cpi.toFixed(2);
   const displayCalls = normalizedCalls === null ? row.calls : normalizedCalls;
 
+  // Start editing a field (opens popover)
   const handleStartEdit = (
     field: EditableField,
     currentValue: number | string,
     event: React.MouseEvent<HTMLElement>,
   ) => {
     if (pendingEdits.has(row.rowKey)) {
-      return;
+      return; // Prevent concurrent edits on same row
     }
     setEditingField(field);
     setEditValue(String(currentValue));
@@ -47,6 +53,7 @@ export function HcpRowComponent({ row, onEdit, pendingEdits }: HcpRowProps) {
     setAnchorEl(event.currentTarget);
   };
 
+  // Cancel edit (close popover without saving)
   const handleCancelEdit = () => {
     setEditingField(null);
     setEditValue("");
@@ -54,6 +61,7 @@ export function HcpRowComponent({ row, onEdit, pendingEdits }: HcpRowProps) {
     setAnchorEl(null);
   };
 
+  // Save edit (validate and call parent handler)
   const handleSaveEdit = async () => {
     if (!editingField) return;
 
@@ -78,6 +86,7 @@ export function HcpRowComponent({ row, onEdit, pendingEdits }: HcpRowProps) {
     }
   };
 
+  // Keyboard shortcuts: Enter to save, Escape to cancel
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleSaveEdit();
@@ -86,6 +95,7 @@ export function HcpRowComponent({ row, onEdit, pendingEdits }: HcpRowProps) {
     }
   };
 
+  // Render editable cell with hover effect and edit icon
   const renderEditableCell = (
     field: EditableField,
     displayValue: string | number,

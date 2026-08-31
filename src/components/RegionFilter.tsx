@@ -1,3 +1,6 @@
+// Component: Region filter dropdown
+// Allows filtering data by geographic region
+// Includes "All Regions" option to show all data
 import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
 
 interface RegionFilterProps {

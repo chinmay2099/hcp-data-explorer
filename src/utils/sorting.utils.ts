@@ -1,14 +1,23 @@
+// Utility: Sorting functions for HCP data
+// Supports sorting by name, calls, TRx, NRx, or calculated CPI
+// Handles mixed data types (string/number) and null values gracefully
 import { type HcpRow } from "../types/hcp";
-import { normalizeCalls } from "../lib/hcp-utils";
+import { normalizeCalls } from "./hcp-utils";
 
+// Supported sortable columns
 export type SortColumn = "name" | "calls" | "trx" | "nrx" | "cpi";
+// Sort direction: ascending, descending, or none (no sort)
 export type SortDirection = "asc" | "desc" | "none";
 
+// Current sort state (column + direction)
 export interface SortState {
   column: SortColumn;
   direction: SortDirection;
 }
 
+// Sort rows based on current sort state
+// Returns new array (immutable), handles "none" direction by returning unsorted
+// Uses multiplier (-1 for desc, 1 for asc) to reverse comparison
 export function sortRows(rows: HcpRow[], sortState: SortState): HcpRow[] {
   if (sortState.direction === "none") {
     return [...rows];
@@ -46,6 +55,8 @@ export function sortRows(rows: HcpRow[], sortState: SortState): HcpRow[] {
   });
 }
 
+// Calculate CPI for a single row
+// Returns null if calls is invalid or TRx is zero
 function calculateRowCPI(row: HcpRow): number | null {
   const normalizedCalls = normalizeCalls(row.calls);
   if (!normalizedCalls) return null;

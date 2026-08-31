@@ -1,3 +1,6 @@
+// Component: Main application component
+// Orchestrates data loading, filtering, sorting, editing, and theming
+// Coordinates all hooks and components to build the HCP data explorer
 import {
   Container,
   Typography,
@@ -23,17 +26,22 @@ import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
 
 function App() {
+  // Load initial data on mount
   const { data: initialData, loading } = useHcpData();
+  // Local state for editable data (tracks changes)
   const [data, setData] = useState<HcpRow[]>([]);
+  // Tenant theming
   const { theme, currentTenant, setTenant, availableTenants } =
     useTenantTheme();
 
+  // Sync initial data to local state when loaded
   useEffect(() => {
     if (initialData.length > 0) {
       setData(initialData);
     }
   }, [initialData]);
 
+  // Create MUI theme from tenant configuration
   const muiTheme = createTheme({
     palette: {
       primary: {
@@ -66,6 +74,7 @@ function App() {
     },
   });
 
+  // Filtering: search, region, territory
   const {
     searchTerm,
     setSearchTerm,
@@ -78,10 +87,14 @@ function App() {
     filteredData,
   } = useFiltering(data);
 
+  // Sorting: apply to filtered data
   const { sortState, sortedData, toggleSort } = useSorting(filteredData);
 
+  // Edit history: undo/redo functionality
   const { addCommand, undo, redo, canUndo, canRedo } = useEditHistory();
 
+  // Handle data update from table edit
+  // Updates local state and records edit command for undo/redo
   const handleDataUpdate = (
     updatedData: HcpRow[],
     rowKey: string,
@@ -93,14 +106,17 @@ function App() {
     addCommand({ rowKey, field, oldValue, newValue });
   };
 
+  // Undo: revert last edit using history hook
   const handleUndo = () => {
     setData((prev) => undo(prev));
   };
 
+  // Redo: re-apply next edit using history hook
   const handleRedo = () => {
     setData((prev) => redo(prev));
   };
 
+  // Loading state
   if (loading) {
     return (
       <ThemeProvider theme={muiTheme}>

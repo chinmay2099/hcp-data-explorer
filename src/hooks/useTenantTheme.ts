@@ -1,9 +1,14 @@
+// Hook: Manages multi-tenant theming with validation
+// Allows switching between different tenant-specific color schemes
 import { useState, useMemo, useCallback } from "react";
-import { DEFAULT_THEME, TENANT_THEMES } from "../lib/theme-config";
+import { DEFAULT_THEME, TENANT_THEMES } from "../utils/theme-config";
 
 export function useTenantTheme() {
+  // State: currently selected tenant
   const [currentTenant, setCurrentTenant] = useState<string>("default");
 
+  // Computed: validated theme object for current tenant
+  // Falls back to defaults for invalid/missing values
   const theme = useMemo(() => {
     if (currentTenant === "default") {
       return DEFAULT_THEME;
@@ -14,6 +19,7 @@ export function useTenantTheme() {
       return DEFAULT_THEME;
     }
 
+    // Validate each theme property, fallback to default if invalid
     const validatedTheme = {
       appName: tenantConfig.appName ?? DEFAULT_THEME.appName,
       primary: isValidColor(tenantConfig.primary)
@@ -36,6 +42,7 @@ export function useTenantTheme() {
         : DEFAULT_THEME.radius,
     };
 
+    // Test colors override (demo/development only)
     const testColors = {
       default: { primary: "#0B5FA5", surface: "#F2F5F8" },
       aurelia: { primary: "#2E7D32", surface: "#E8F5E9" },
@@ -55,6 +62,7 @@ export function useTenantTheme() {
     return testTheme;
   }, [currentTenant]);
 
+  // Handler: switch to a different tenant
   const setTenant = useCallback((tenant: string) => {
     setCurrentTenant(tenant);
   }, []);
@@ -67,12 +75,14 @@ export function useTenantTheme() {
   };
 }
 
+// Validator: checks if string is valid hex color (#FFF or #FFFFFF)
 function isValidColor(value: string | undefined): value is string {
   if (!value) return false;
   const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
   return hexColorRegex.test(value);
 }
 
+// Validator: checks if number is valid border radius (0-24px)
 function isValidRadius(value: number | undefined): value is number {
   if (value === undefined || value === null) return false;
   const num = Number(value);
